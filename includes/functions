@@ -1,0 +1,126 @@
+#!/bin/bash
+# 
+# SYSTEM_TOOLS_functions
+# ----------------------
+# Podporne funkcie pre SYSTEM_TOOLS skripty
+# Support functions used in SYSTEM_TOOLS scripts
+#
+# 2009 LALA -> lala (at) linuxor (dot) sk
+#
+
+
+# echostart() 
+# ----------
+# Pouziva sa pri hlaseni statusu pre vykonany prikaz
+# Used in status for command
+function echostart () 
+{
+    echo -n "  " $*
+}
+
+
+# check_rv()
+# ----------
+# Kontroluje navratovu hodnotu prikazu ( 0=OK , 1=ERR )
+# Check return value of command ( 0=OK, 1=ERR )
+function check_rv ()
+{
+    if [ $? -eq 0 ]; then
+	echo -ne "\t[ OK ]\n"
+    else
+	echo -ne "\t[ ERR ]\n"
+    fi
+}
+
+
+# check_rv_output()
+# -----------------
+# Kontroluje navratovu hodnotu prikazu ( 0=OK , 1=ERR )
+# Check return value of command ( 0=OK, 1=ERR )
+function check_rv_output ()
+{
+    if [ $? -eq 0 ]; then
+	let $1+=0
+    else
+	let $1+=1
+    fi
+}
+
+
+# exec_comm_status()
+# ------------------
+# Spusti prikaz a vypise status vykonania
+# 1.parameter: spustany prikaz
+# 2.parameter: parametre prikazu
+# 3.parameter: startovacia hlaska
+# 4.parameter: STDIO vystup ( 0=OFF, 1=ON )
+# 5.parameter: STDERR vystup ( 0=OFF, 1=ON )
+#
+# Run command and print status of command
+# 1.parameter: command which we want to execute
+# 2.parameter: arguments of command
+# 3.parameter: startup message
+# 4.parameter: STDIO output ( 0=OFF, 1=ON ) 
+# 5.parameter: STDERR output ( 0=OFF, 1=ON )
+function exec_comm_status ()
+{
+    COMM=$1
+    ARG=$2
+    MESS=$3
+    STDIO=$4
+    STDERR=$5
+
+    echostart $MESS
+
+    if [ $STDERR -eq 0 ] && [ $STDIO -eq 0 ]; then
+	$COMM $ARG 1,2>/dev/null
+    fi
+
+    if [ $STDERR -eq 1 ] && [ $STDIO -eq 1 ]; then
+	$COMM $ARG 
+    fi	
+
+    if [ $STDERR -eq 0 ] && [ $STDIO -eq 1 ]; then
+	$COMM $ARG 2>/dev/null
+    fi	
+
+    if [ $STDERR -eq 1 ] && [ $STDIO -eq 0 ]; then
+	$COMM $ARG 1>/dev/null
+    fi	
+
+    check_rv
+    return
+}
+
+
+# setcolor()
+# ----------
+# Nastavi farbu pisma podla parametra
+# Set color of text
+function setcolor ()
+{
+    color=$1
+    echo -e "$color\b"
+    return
+}
+
+
+# resetcolor()
+# ------------
+# Resetne farbu pisma
+# Reset color of text
+function resetcolor ()
+{
+    tput sgr0
+}
+
+
+# backspace()
+# -----------
+# BACKSPACE
+function bacspace ()
+{
+    echo -e "\b\c"
+}
+
+
