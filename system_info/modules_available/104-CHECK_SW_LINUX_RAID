@@ -1,0 +1,32 @@
+#!/bin/bash
+
+
+######## CHECK (system_info.sh -c)
+if [ $1 == "check" ]
+    then
+
+
+    ################# VARIABLES for CHECK of CHECKs :-)
+    CHECK_SW_LINUX_RAID_status=0
+
+
+    ######## CHECK_SW_LINUX_RAID
+    ######## /proc/mdstat
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    $PRINTE "| $MSG_SW_LINUX_RAID (# $CAT /proc/mdstat)" >> $OUTPUT
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    
+    if [[ ! -f "$CAT" || ! -f "/proc/mdstat" ]]
+	then
+	$PRINT "$MSG_MISSING_COMMAND $CAT, /proc/mdstat" >> $OUTPUT
+	$PRINT "$MSG_NEED_PACKAGE $CAT_package" >> $OUTPUT
+	let CHECK_SW_LINUX_RAID_status=1
+
+	else
+	$CAT /proc/mdstat >> $OUTPUT
+	check_rv_output CHECK_SW_LINUX_RAID_status
+    fi
+    
+    $PRINTE "\n\n" >> $OUTPUT
+
+fi

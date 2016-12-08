@@ -1,0 +1,99 @@
+#!/bin/bash
+
+
+######## CONFIGURATION
+
+# dir(s) for file integrity check
+# -------------------------------
+CHECK_FILES_INTEGRITY_TREE_DIR="/etc/logrotate.d"
+
+######## CONFIGURATION
+
+
+######## INITTIALIZATION (system_info.sh -i)
+    if [ "$1" == "init" ]
+	then
+
+	$RM -fR $HASH_FILES_DIR/*
+	
+	for dir in $CHECK_FILES_INTEGRITY_DIR
+	do
+	
+	    for file in `"$FIND" $dir -type f`
+	    do
+		if [ ! -f "$HASH_FILES_DIR$file" ]
+		    then
+		    FILENAME=`"$BASENAME" "$file"`
+		    DIRECTORYNAME=`"$DIRNAME" "$file"`
+		    $MKDIR -p $HASH_FILES_DIR$DIRECTORYNAME
+		    $TOUCH $HASH_FILES_DIR$DIRECTORYNAME/$FILENAME
+		    sha1sum "$file" | $AWK '{ print $1 }' >$HASH_FILES_DIR$DIRECTORYNAME/$FILENAME
+		fi
+	    done
+	done
+    fi
+
+
+######## CHECK (system-info.sh -c)
+if [ "$1" == "check" ]
+    then
+
+    ################# VARIABLES for CHECK of CHECKs :-)
+    CHECK_FILES_INTEGRITY_status=0
+
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    $PRINTE "| $MSG_FILES_INTEGRITY (sha1)" >> $OUTPUT
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+
+    if [[ ! -f "$FIND" || ! -f "$SHA1SUM" || ! -f "$AWK" || ! -f "$BASENAME" || ! -f "$DIRNAME" || ! -f "$CAT" ]] 
+        then
+        $PRINT "$MSG_MISSING_COMMAND $FIND, $SHA1SUM, $AWK, $BASENAME, $DIRNAME, $CAT" >> $OUTPUT
+        $PRINT "$MSG_NEED_PACKAGE $FIND_package, $SHA1SUM_package, $AWK_package, $DIRNAME_package, $CAT_package" >> $OUTPUT
+	let CHECK_FILES_INTEGRITY_status=1
+
+        else
+	
+        # zero_changed
+        zero_changed=0
+
+	
+        for dir in $CHECK_FILES_INTEGRITY_DIR
+        do
+	
+    	    for file in `$FIND $dir -type f`
+	    do
+
+	    if [ -f "$HASH_FILES_DIR$file" ]
+		then
+		FILENAME=`$BASENAME $file`
+		check_rv_output CHECK_FILES_INTEGRITY_status
+		DIRECTORYNAME=`$DIRNAME $file`
+		check_rv_output CHECK_FILES_INTEGRITY_status
+		file_sha1_init=`$CAT $HASH_FILES_DIR$DIRECTORYNAME/$FILENAME`
+		check_rv_output CHECK_FILES_INTEGRITY_status
+		file_sha1_current=`$SHA1SUM $file | $AWK '{ print $1 }'`
+		check_rv_output CHECK_FILES_INTEGRITY_status
+		    
+	    
+		# if $file_sha1_init == $file_sha1_current -> OK else WARN
+		case $file_sha1_current in
+		$file_sha1_init)
+		    : # noop
+		    ;;
+		*)
+		    $PRINT "$MSG_FILES_INTEGRITY_FILE_CHANGED $file" >> $OUTPUT
+		    let zero_changed=1+0
+		    ;;
+		esac
+	    fi
+    	    done
+	done
+    fi
+    
+    if [ "$zero_changed" -eq "0" ]
+        then
+        $PRINT "$MSG_FILES_INTEGRITY_FILE_NOT_CHANGED" >> $OUTPUT
+    fi
+    $PRINTE "\n\n" >> $OUTPUT
+    
+fi

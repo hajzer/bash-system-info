@@ -1,0 +1,31 @@
+#!/bin/bash
+
+
+######## CHECK (system_info.sh -c)
+if [ $1 == "check" ]
+    then
+
+
+    ################# VARIABLES for CHECK of CHECKs :-)
+    CHECK_CLAMAV_status=0
+
+
+    ######## CHECK_CLAMAV
+    ######## FRESHCLAM STATUS
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    $PRINTE "| FRESHCLAM STATUS (# $FRESHCLAM $FRESHCLAM_p)" >> $OUTPUT
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    
+    if [ ! -f "$FRESHCLAM" ]
+	then
+    	$PRINT "$MSG_MISSING_COMMAND $FRESHCLAM" >> $OUTPUT
+	$PRINT "$MSG_NEED_PACKAGE $FRESHCLAM_package" >> $OUTPUT
+	$PRINTE "\n\n" >> $OUTPUT
+	let CHECK_CLAMAV_status=1
+
+	else
+	$FRESHCLAM $FRESHCLAM_p >> $OUTPUT
+	$PRINTE "\n\n" >> $OUTPUT
+    fi
+
+fi

@@ -1,0 +1,22 @@
+#!/bin/bash
+
+
+######## CHECK (system_info.sh -c)
+if [ "$1" == "check" ]
+    then
+
+
+    ################# VARIABLES for CHECK of CHECKs :-)
+    CHECK_LOADED_KERNEL_MODULES_status=0
+
+	
+    ######## lsmod ...
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    $PRINTE "| $MSG_LOADED_KERNEL_MODULES" >> $OUTPUT
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+
+    $LSMOD >> $OUTPUT
+    check_rv_output CHECK_LOADED_KERNEL_MODULES_status
+    $PRINTE "\n\n" >> $OUTPUT
+
+fi

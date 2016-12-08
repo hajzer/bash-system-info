@@ -1,0 +1,43 @@
+#!/bin/bash
+
+
+######## CHECK (system_info.sh -c)
+if [ $1 == "check" ]
+    then
+
+
+    ################# VARIABLES for CHECK of CHECKs :-)
+    CHECK_XEN_status=0
+
+
+    ######## CHECK_XEN
+    ######## XM
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    $PRINTE "| XEN" >> $OUTPUT
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    
+    if [ ! -f "$XM" ]
+	then
+	$PRINT "$MSG_MISSING_COMMAND $XM" >> $OUTPUT
+	$PRINT "$MSG_NEED_PACKAGE $XM_package" >> $OUTPUT
+	let CHECK_XEN_status=1
+
+	else
+	$PRINTE "| XEN: $MSG_XEN_DOMAINS (# $XM list --label)                                       " >> $OUTPUT
+	$PRINTE "| States: [R]unning, [B]locked, [P]aused, [S]hutdown, [C]rashed, [D]ying           " >> $OUTPUT
+	$PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+	
+	$XM list --label >> $OUTPUT
+	check_rv_output CHECK_XEN_status
+	
+	$PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+	$PRINTE "| XEN: $MSG_XEN_VCPU (# $XM vcpu-list)" >> $OUTPUT
+	$PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+	
+	$XM vcpu-list >> $OUTPUT
+	check_rv_output CHECK_XEN_status
+    fi
+    
+    $PRINTE "\n\n" >> $OUTPUT
+
+fi

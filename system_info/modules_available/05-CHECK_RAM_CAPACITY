@@ -1,0 +1,32 @@
+#!/bin/bash
+
+
+######## CHECK (system_info.sh -c)
+if [ $1 == "check" ]
+    then
+
+
+    ################# VARIABLES for CHECK of CHECKs :-)
+    CHECK_RAM_CAPACITY_status=0
+
+
+    ######## CHECK_RAM_CAPACITY
+    ######## FREE
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    $PRINTE "| $MSG_RAM_CAPACITY (# $FREE $FREE_p)" >> $OUTPUT
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+
+    if [ ! -f "$FREE" ]
+	then
+	$PRINT "$MSG_MISSING_COMMAND $FREE" >> $OUTPUT
+	$PRINT "$MSG_NEED_PACKAGE $FREE_package" >> $OUTPUT
+	let CHECK_RAM_CAPACITY_status=1
+	
+	else
+	$FREE $FREE_p >> $OUTPUT
+	check_rv_output CHECK_RAM_CAPACITY_status
+    fi
+
+    $PRINTE "\n\n" >> $OUTPUT
+
+fi

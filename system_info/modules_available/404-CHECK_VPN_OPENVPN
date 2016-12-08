@@ -1,0 +1,52 @@
+#!/bin/bash
+
+
+######## CONFIGURATION
+
+# path to OpenVPN configuration directory
+# ---------------------------------------
+CHECK_VPN_OPENVPN_CONFIGURATION_DIR="/etc/openvpn"
+
+# path to OpenVPN configuration file
+# -----------------------------------
+CHECK_VPN_OPENVPN_CONFIGURATION_FILE="$CHECK_VPN_OPENVPN_CONFIGURATION_DIR/server.conf"
+
+######## CONFIGURATION
+
+
+######## CHECK (system_info.sh -c)
+if [ $1 == "check" ]
+    then
+
+
+    ################# VARIABLES for CHECK of CHECKs :-)
+    CHECK_VPN_OPENVPN_status=0
+
+
+    ######## CHECK_VPN_OPENVPN
+    ######## OPENVPN
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    $PRINTE "| $MSG_VPN_OPENVPN" >> $OUTPUT
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+
+    if [[ ! -f "$CHECK_VPN_OPENVPN_CONFIGURATION_FILE" || ! -f "$CAT" || ! -f "$GREP" || ! -f "$AWK" ]]
+	then
+	$PRINT "$MSG_MISSING_COMMAND $CAT, $GREP, $AWK, $CHECK_VPN_OPENVPN_CONFIGURATION_FILE" >> $OUTPUT
+	$PRINT "$MSG_NEED_PACKAGE $CAT_package, $GREP_package, $AWK_package" >> $OUTPUT
+	let CHECK_VPN_OPENVPN_status=1
+
+	else
+	openvpn_status=`$CAT $CHECK_VPN_OPENVPN_CONFIGURATION_FILE | $GREP status | $AWK '{ print $2 }'`
+	check_rv_output CHECK_VPN_OPENVPN_status	
+	
+	if [ "$openvpn_status" != "" ]
+	    then
+	    $CAT $CHECK_VPN_OPENVPN_CONFIGURATION_DIR/$openvpn_status >> $OUTPUT
+	    else
+	    $PRINT "$MSG_MISSING_COMMAND $CHECK_VPN_OPENVPN_CONFIGURATION_DIR/$openvpn_status" >> $OUTPUT
+	fi
+    fi
+    
+    $PRINTE "\n\n" >> $OUTPUT
+
+fi

@@ -1,0 +1,70 @@
+#!/bin/bash
+
+
+######## INITIALIZATION (system_info.sh -i)
+    if [ "$1" == "init" ]
+	then
+
+
+	if [ -f "$WORKDIR/route_current" ]
+	    then
+	    $RM $WORKDIR/route_current
+	fi
+	if [ -f "$WORKDIR/route_init" ]
+	    then
+	    $RM $WORKDIR/route_init
+	fi
+    
+	$ROUTE >$WORKDIR/route_init
+	check_rv_output CHECK_ROUTE_TABLE_DIFF_status
+	$PRINTE "$MSG_ROUTE_TABLE_DIFF_INIT"
+
+    fi    
+
+
+######## CHECK (system_info.sh -c)
+    if [ "$1" == "check" ]
+	then
+
+	
+	################# VARIABLES for CHECK of CHECKs :-)
+	CHECK_ROUTE_TABLE_DIFF_status=0
+
+	
+	######## ROUTE
+	$PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+	$PRINTE "| $MSG_ROUTE_TABLE_DIFF" >> $OUTPUT
+	$PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+
+	if [[ ! -f "$ROUTE" || ! -f "$SHA1SUM" || ! -f "$AWK" ]] 
+    	    then
+    	    $PRINT "$MSG_MISSING_COMMAND $ROUTE, $SHA1SUM, $AWK" >> $OUTPUT
+	    $PRINT "$MSG_NEED_PACKAGE $ROUTE_package, $SHA1SUM_package, $AWK_package" >> $OUTPUT
+	    let CHECK_ROUTE_TABLE_DIFF_status=1
+
+    	    else
+    	    if [ -f "$WORKDIR/route_init" ]
+		then
+		route_sha1_current=`$ROUTE >$WORKDIR/route_current; $SHA1SUM $WORKDIR/route_current | $AWK '{ print $1 }'`
+		check_rv_output CHECK_ROUTE_TABLE_DIFF_status
+		route_sha1_init=`$SHA1SUM < $CAT $WORKDIR/route_init | $AWK '{ print $1 }'`
+    		check_rv_output CHECK_ROUTE_TABLE_DIFF_status
+			
+		# if $route_sha1_current == $route_sha1_init -> OK else WARN
+		case $route_sha1_current in
+		$route_sha1_init)
+		    $PRINT "$MSG_ROUTE_TABLE_DIFF_UNCHANGED" >> $OUTPUT
+		    ;;
+		*)
+		    $PRINT "$MSG_ROUTE_TABLE_DIFF_CHANGED" >> $OUTPUT
+		    ;;
+		esac
+						
+		else
+    		$PRINTE "$MSG_ROUTE_TABLE_DIFF_MISSING_INIT" >> $OUTPUT
+	    fi				
+	fi
+	
+	$PRINTE "\n\n" >> $OUTPUT
+
+    fi

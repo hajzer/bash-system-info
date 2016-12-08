@@ -1,0 +1,32 @@
+#!/bin/bash
+
+
+######## CHECK (system_info.sh -c)
+if [ $1 == "check" ]
+    then
+
+
+    ################# VARIABLES for CHECK of CHECKs :-)
+    CHECK_DISK_STAT_status=0
+
+
+    ######## CHECK_DISK_STAT
+    ######## IOSTAT
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    $PRINTE "| $MSG_DISK_STAT (# $IOSTAT $IOSTAT_p)" >> $OUTPUT
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    
+    if [ ! -f "$IOSTAT" ]
+	then
+	$PRINT "$MSG_MISSING_COMMAND $IOSTAT" >> $OUTPUT
+	$PRINT "$MSG_NEED_PACKAGE $IOSTAT_package" >> $OUTPUT
+	let CHECK_DISK_STAT_status=1
+	
+	else
+	$IOSTAT $IOSTAT_p >> $OUTPUT
+	check_rv_output CHECK_DISK_STAT_status
+    fi
+
+    $PRINTE "\n\n" >> $OUTPUT
+
+fi

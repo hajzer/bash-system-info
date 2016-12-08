@@ -1,0 +1,31 @@
+#!/bin/bash
+
+
+######## CHECK (system_info.sh -c)
+if [ $1 == "check" ]  
+    then
+
+    
+    ################# VARIABLES for CHECK of CHECKs :-)
+    CHECK_LAST_LOGGED_USERS_status=0
+
+
+    ######## CHECK_LAST_LOGGED_USERS
+    ######## LAST
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    $PRINTE "| $MSG_LAST_LOGGED_USERS (# $LAST)" >> $OUTPUT
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    
+    if [ ! -f "$LAST" ]
+	then
+	$PRINT "$MSG_MISSING_COMMAND $LAST" >> $OUTPUT
+	$PRINT "$MSG_NEED_PACKAGE $LAST_package" >> $OUTPUT
+	
+	else
+	$LAST >> $OUTPUT
+	check_rv_output CHECK_LAST_LOGGED_USERS_status
+    fi
+
+    $PRINTE "\n\n" >> $OUTPUT
+
+fi

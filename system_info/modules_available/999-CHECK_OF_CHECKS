@@ -1,0 +1,49 @@
+#!/bin/bash
+
+
+######## CHECK (system_info.sh -c)
+if [ $1 == "check" ]
+    then
+
+ 
+    ################ VARIABLES FOR CHECK OF CHECKs :-)
+    CHECK_OF_CHECKS_status=0
+
+
+    if [[ ! -f "$FIND" || ! -f "$SORT" || ! -f "$AWK" ]]
+	then
+	$PRINT "$MSG_MISSING_COMMAND $FIND, $SORT, $AWK" >> $OUTPUT
+	$PRINT "$MSG_NEED_PACKAGE $FIND_package, $SORT_package, $AWK_package" >> $OUTPUT
+	let CHECK_OF_CHECKS_status=1
+	
+	else
+	######## CHECK_OF_CHECKS / KONTROLA VYKONANIA JEDNOTLIVYCH KONTROL
+	######## KONTROLA KONTROL :-)))
+	$PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+	$PRINTE "| $MSG_CHECK_OF_CHECKS" >> $OUTPUT
+	$PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+
+
+	for checkin in `$FIND $MODULES_ACTIVE -type l | $SORT -n`
+	do
+	    check=$($PRINT $checkin | $AWK -F - '{ print $2 }')
+	    check_rv_output CHECK_OF_CHECKS_status		
+
+	    checknow=$check
+	    check_rv_output CHECK_OF_CHECKS_status
+    	    checknow+="_status"
+	    check_rv_output CHECK_OF_CHECKS_status
+
+	    if [[ ${!checknow} == 0 ]]
+		then
+		$PRINT "$check = OK" >> $OUTPUT
+	    	check_rv_output CHECK_OF_CHECKS_status
+	    
+		else
+		$PRINT "$check = ERR" >> $OUTPUT
+		check_rv_output CHECK_OF_CHECKS_status
+	    fi
+	done
+
+    fi
+fi

@@ -1,0 +1,32 @@
+#!/bin/bash
+
+
+######## CHECK (system_info.sh -c)
+if [ $1 == "check" ]
+    then 
+
+
+    ################# VARIABLES for CHECK of CHECKs :-)
+    CHECK_MOUNTED_DEVICES_status=0
+
+
+    ######## CHECK_MOUNTED_DEVICES
+    ######## MOUNT
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    $PRINTE "| $MSG_MOUNTED_DEVICES (# $MOUNT $MOUNT_p)" >> $OUTPUT
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+
+    if [ ! -f "$MOUNT" ]
+	then
+	$PRINT "$MSG_MISSING_COMMAND $MOUNT" >> $OUTPUT
+	$PRINT "$MSG_NEED_PACKAGE $MOUNT_package" >> $OUTPUT
+	let CHECK_MOUNTED_DEVICES_status=1
+	
+	else
+	$MOUNT $MOUNT_p >> $OUTPUT
+	check_rv_output CHECK_MOUNTED_DEVICES_status
+    fi
+	
+    $PRINTE "\n\n" >> $OUTPUT
+
+fi

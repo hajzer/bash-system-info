@@ -1,0 +1,39 @@
+#!/bin/bash
+
+
+######## CHECK (system_info.sh -c)
+if [ $1 == "check" ]
+    then
+
+
+    ################# VARIABLES for CHECK of CHECKs :-)
+    CHECK_LVM_status=0
+
+
+    ######## CHECK_LVM
+    ######## LVS, PVS
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    $PRINTE "| LVM " >> $OUTPUT
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+
+    if [[ ! -f "$LVS" || ! -f "$PVS" ]]
+	then
+	$PRINT "$MSG_MISSING_COMMAND $LVS, $PVS" >> $OUTPUT
+	$PRINT "$MSG_NEED_PACKAGE $LVS_package, $PVS_package" >> $OUTPUT
+	let CHECK_LVM_status=1
+	
+	else
+	$PRINT "| LVM: $MSG_LVM_PVS (# $PVS $PVS_p)" >> $OUTPUT
+	$PRINT "+--------------------------------------------------------------------------------->" >> $OUTPUT
+	$PVS $PVS_p >> $OUTPUT
+	check_rv_output CHECK_LVM_status
+	$PRINT "+--------------------------------------------------------------------------------->" >> $OUTPUT
+	$PRINT "| LVM: $MSG_LVM_LVS (# $LVS $LVS_p)" >> $OUTPUT
+	$PRINT "+--------------------------------------------------------------------------------->" >> $OUTPUT
+	$LVS $LVS_p >> $OUTPUT
+	check_rv_output CHECK_LVM_status
+    fi
+
+    $PRINTE "\n\n" >> $OUTPUT
+
+fi

@@ -1,0 +1,32 @@
+#!/bin/bash
+
+
+######## CHECK (system_info.sh -c)
+if [ $1 == "check" ]
+    then
+    
+    
+    ################# VARIABLES for CHECK of CHECKs :-)
+    CHECK_CPU_STAT_status=0
+
+
+    ######## CHECK_CPU_STAT
+    ######## MPSTAT
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    $PRINTE "| $MSG_CPU_STAT (# $MPSTAT $MPSTAT_p)" >> $OUTPUT
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+
+    if [ ! -f "$MPSTAT" ]
+	then
+	$PRINT "$MSG_MISSING_COMMAND $MPSTAT" >> $OUTPUT
+	$PRINT "$MSG_NEED_PACKAGE $MPSTAT_package" >> $OUTPUT
+	let CHECK_CPU_STAT_status=1
+	
+	else
+	$MPSTAT $MPSTAT_p >> $OUTPUT
+	check_rv_output CHECK_CPU_STAT_status
+    fi
+
+    $PRINTE "\n\n" >> $OUTPUT
+
+fi

@@ -1,0 +1,68 @@
+#!/bin/bash
+
+
+######## INITIALIZATION (system_info.sh -i)
+if [ "$1" == "init" ]
+    then
+    if [ -f "$WORKDIR/kernel_modules_current" ]
+        then 
+        $RM $WORKDIR/kernel_modules_current
+    fi
+
+    if [ -f "$WORKDIR/kernel_modules_init" ]
+	then
+	$RM $WORKDIR/kernel_modules_init
+    fi
+
+    $LSMOD >$WORKDIR/kernel_modules_init
+    $PRINTE "$MSG_LOADED_KERNEL_MODULES_DIFF_INIT"	
+fi
+
+
+######## CHECK (system_info.sh -c)
+if [ "$1" == "check" ]
+    then
+
+
+    ################# VARIABLES for CHECK of CHECKs :-)
+    CHECK_LOADED_KERNEL_MODULES_DIFF_status=0
+
+	
+    ######## LSMOD ...
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    $PRINTE "| $MSG_LOADED_KERNEL_MODULES_DIFF" >> $OUTPUT
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+
+    if [[ ! -f "$LSMOD" || ! -f "$SHA1SUM" || ! -f "$AWK" ]]
+        then
+        $PRINT "$MSG_MISSING_COMMAND $LSMOD, $SHA1SUM, $AWK" >> $OUTPUT
+        $PRINT "$MSG_NEED_PACKAGE $LSMOD_package, $SHA1SUM_package, $AWK_package" >> $OUTPUT
+	let CHECK_LOADED_KERNEL_MODULES_DIFF_status=1
+	
+        else
+        if [ -f "$WORKDIR/kernel_modules_init" ]
+	    then
+	    kernel_modules_sha1_current=`$LSMOD >$WORKDIR/kernel_modules_current; $SHA1SUM $WORKDIR/kernel_modules_current | $AWK '{ print $1 }'`
+	    check_rv_output CHECK_LOADED_KERNEL_MODULES_DIFF_status
+	    kernel_modules_sha1_init=`$SHA1SUM < $CAT $WORKDIR/kernel_modules_init | $AWK '{ print $1 }'`
+	    check_rv_output CHECK_LOADED_KERNEL_MODULES_DIFF_status
+			
+	    # if $route_sha1_current == $route_sha1_init -> OK else WARN
+	    case $kernel_modules_sha1_current in
+	    $kernel_modules_sha1_init)
+		$PRINT "$MSG_LOADED_KERNEL_MODULES_DIFF_UNCHANGED" >> $OUTPUT
+		;;
+	    *)
+		$PRINT "$MSG_LOADED_KERNEL_MODULES_DIFF_CHANGED" >> $OUTPUT
+		;;
+	    esac
+	
+						
+	    else
+	    $PRINT "$MSG_LOADED_KERNEL_MODULES_DIFF_MISSING_INIT" >> $OUTPUT
+	fi				
+    fi
+
+    $PRINTE "\n\n" >> $OUTPUT
+
+fi

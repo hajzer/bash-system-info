@@ -1,0 +1,91 @@
+#!/bin/bash
+
+
+######## CHECK (system_info.sh -c)
+if [ $1 == "check" ]
+    then
+
+
+    ################# VARIABLES for CHECK of CHECKs :-)
+    CHECK_UPGRADE_KERNEL_status=0
+
+
+    ######## CHECK_UPGRADE_KERNEL
+    # WHICH DISTRO?
+    case $DISTRO in
+    debian)
+	######## DPKG + (kernel -> /proc)
+	$PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+	$PRINTE "| $MSG_UPGRADE_KERNEL_CURRENT" >> $OUTPUT
+	$PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+
+	$CAT /proc/version >> $OUTPUT
+	check_rv_output CHECK_UPGRADE_KERNEL_status
+	$PRINTE  "\n\n" >> $OUTPUT
+	$PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+	$PRINTE "| $MSG_UPGRADE_KERNEL_PKG_CHECK" >> $OUTPUT
+	$PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+
+	if [ ! -f "$DPKG" ] 
+	    then
+	    $PRINT "$MSG_MISSING_COMMAND $DPKG" >> $OUTPUT
+	    $PRINT "$MSG_NEED_PACKAGE $DPKG_package" >> $OUTPUT
+	    let CHECK_UPGRADE_KERNEL_status=1
+	    
+	    else
+	    $DPKG -S `$READLINK -f /vmlinuz` >> $OUTPUT
+	    check_rv_output CHECK_UPGRADE_KERNEL_status
+	fi
+
+	$PRINTE "\n\n" >> $OUTPUT
+	
+	$PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+	$PRINTE "| $MSG_UPGRADE_KERNEL_INSTALLED" >> $OUTPUT
+	$PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+	
+	if [ ! -f "$DPKG" ] 
+	    then
+	    $PRINT "$MSG_MISSING_COMMAND $DPKG" >> $OUTPUT
+	    $PRINT "$MSG_NEED_PACKAGE $DPKG_package" >> $OUTPUT
+
+	    else
+	    $DPKG -l linux-image* | awk '$1 ~ /ii/ { print $0 }' >> $OUTPUT
+	    check_rv_output CHECK_UPGRADE_KERNEL_status
+	fi
+
+	$PRINTE "\n\n" >> $OUTPUT
+
+	$PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+	$PRINTE "| $MSG_UPGRADE_KERNEL_NEED_UPGRADE" >> $OUTPUT
+	$PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+
+	if [[ ! -f "$DPKG"  || ! -f "$READLINK" || ! -f /vmlinuz ]] 
+	    then
+	    $PRINT "$MSG_MISSING_COMMAND $DPKG, $READLINK, /vmlinuz" >> $OUTPUT
+	    $PRINT "$MSG_NEED_PACKAGE $DPKG_package, $READLINK_package" >> $OUTPUT
+	    
+	    else
+	    kernfile=`$READLINK -f /vmlinuz` >> $OUTPUT
+	    check_rv_output CHECK_UPGRADE_KERNEL_status
+	    kernel=`$DPKG -S $kernfile | $AWK -F : '{print $1}'` >> $OUTPUT
+	    check_rv_output CHECK_UPGRADE_KERNEL_status
+	    apt-cache policy $kernel | $GREP Installed: >> $OUTPUT
+	    check_rv_output CHECK_UPGRADE_KERNEL_status
+	    apt-cache policy $kernel | $GREP Candidate: >> $OUTPUT
+	    check_rv_output CHECK_UPGRADE_KERNEL_status
+	fi
+
+	$PRINTE "\n\n" >> $OUTPUT
+    ;;
+
+    *)
+	######## Unknown distro
+	$PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+	$PRINTE "| $MSG_UPGRADE_KERNEL_CURRENT" >> $OUTPUT
+	$PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+	$PRINTE "$MSG_UNSUPPORTED_DISTRO" >> $OUTPUT
+	$PRINTE "\n\n" >> $OUTPUT
+    ;;
+    esac
+
+fi

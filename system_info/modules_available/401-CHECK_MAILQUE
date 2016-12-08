@@ -1,0 +1,32 @@
+#!/bin/bash
+
+
+######## CHECK (system_info.sh -c)
+if [ $1 == "check" ]
+    then
+
+
+    ################# VARIABLES for CHECK of CHECKs :-)
+    CHECK_MAILQUE_status=0
+
+
+    ######## CHECK_MAILQUE
+    ######## MAILQ
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    $PRINTE "| $MSG_MAILQUE (# $MAILQ)" >> $OUTPUT
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+
+    if [ ! -f "$MAILQ" ] 
+	then
+	$PRINT "$MSG_MISSING_COMMAND $MAILQ" >> $OUTPUT
+	$PRINT "$MSG_NEED_PACKAGE $MAILQ_package" >> $OUTPUT
+	let CHECK_MAILQUE_status=1
+
+	else
+	$MAILQ >> $OUTPUT
+	check_rv_output CHECK_MAILQUE_status
+    fi
+
+    $PRINTE "\n\n" >> $OUTPUT
+
+fi

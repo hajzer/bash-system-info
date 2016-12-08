@@ -1,0 +1,229 @@
+#!/bin/bash
+
+
+######## CONFIGURATION
+
+# list of dirs for backup
+# -----------------------
+MAKE_BACKUP_DIR_LIST="/etc/acpi
+"
+
+# which packer? 
+# tar | gzip | bzip2 
+# ---------------------
+MAKE_BACKUP_PACK="tar"
+
+# daily = daily
+# Mon | Tue | Wed | Thu | Fri | Sat | Sun = this day weekly
+# ---------------------
+MAKE_BACKUP_TIME="daily"
+
+# check backup - NOT YET IMPLEMENTED
+# ----------------------------------
+# MAKE_BACKUP_CHECK=0
+
+# encrypt backup - NOT YET IMPLEMENTED
+# ----------------------------------
+# MAKE_BACKUP_ENCRYPT=0
+
+# upload backup to remote server - NOT YET IMPLEMENTED
+# -----------------------------------------------------
+# MAKE_BACKUP_UPLOAD=0
+
+######## CONFIGURATION
+
+
+######## CHECK/BACKUP (system_info.sh -c)
+if [ $1 == "check" ]
+    then
+    
+    
+    ################# VARIABLES for CHECK of CHECKs :-)
+    MAKE_BACKUP_status=0
+
+
+    ################# MAKE_BACKUP
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    $PRINTE "| $MSG_BACKUP ($MAKE_BACKUP_TIME)" >> $OUTPUT
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+
+    # BACKUP NAME
+    BACKUP_NAME="backup-"
+    check_rv_output MAKE_BACKUP_status
+    BACKUP_NAME+=`$DATE +'%F'`
+    check_rv_output MAKE_BACKUP_status
+
+    # WHICH PACKER?
+    case $MAKE_BACKUP_PACK in
+    tar)
+        BACKUP_NAME+=".tar"
+        check_rv_output MAKE_BACKUP_status
+	;;
+    gzip)
+        BACKUP_NAME+=".tgz"
+        check_rv_output MAKE_BACKUP_status
+	;;
+    bzip2)
+        BACKUP_NAME+=".tbz"
+        check_rv_output MAKE_BACKUP_status
+	;;
+    *)
+	$PRINT "$MSG_BACKUP_UNSUPPORTED_PACKER" >> $OUTPUT
+	;;
+    esac
+
+
+    # MKDIR BACKUP TMP DIR
+    $MKDIR $BACKUP_DIR_TMP
+    check_rv_output MAKE_BACKUP_status
+    
+    
+    # IF BACKUP EXISTs DO NOTHING
+    if [ -f $BACKUP_DIR/$BACKUP_NAME ] 
+	then
+	$PRINT "$MSG_BACKUP_EXISTS" >> $OUTPUT
+	BACKUPDO=0
+	check_rv_output MAKE_BACKUP_status
+	
+	else
+
+	# Today is?
+	Day=`$DATE | $AWK '{ print $1 }'`
+
+	# WHEN DO BACKUP?
+	case $MAKE_BACKUP_TIME in
+	daily)
+    	    BACKUPDO=1
+	    check_rv_output MAKE_BACKUP_status
+	    ;;
+	Mon)
+	    if [ "$Day" == "Mon" ]
+	    then
+	    BACKUPDO=1
+	    check_rv_output MAKE_BACKUP_status
+	    fi
+	    ;;
+	Tue)
+	    if [ "$Day" == "Tue" ]
+	    then
+	    BACKUPDO=1
+	    check_rv_output MAKE_BACKUP_status
+	    fi
+	    ;;
+	Wed)
+	    if [ "$Day" == "Wed" ]
+	    then
+	    BACKUPDO=1
+	    check_rv_output MAKE_BACKUP_status
+	    fi
+	    ;;    
+	Thu)
+	    if [ "$Day" == "Thu" ]
+	    then
+	    BACKUPDO=1
+	    check_rv_output MAKE_BACKUP_status
+	    fi
+	    ;;
+	Fri)
+	    if [ "$Day" == "Fri" ]
+	    then
+	    BACKUPDO=1
+	    check_rv_output MAKE_BACKUP_status
+	    fi
+	    ;;
+	Sat)
+	    if [ "$Day" == "Sat" ]
+	    then
+	    BACKUPDO=1
+	    check_rv_output MAKE_BACKUP_status
+	    fi
+	    ;;
+	Sun)
+	    if [ "$Day" == "Sun" ]
+	    then
+	    BACKUPDO=1
+	    check_rv_output MAKE_BACKUP_status
+	    fi
+	    ;;
+	*)
+	    $PRINT "$MSG_BACKUP_BAD_TIME"
+	    BACKUPDO=0
+	    check_rv_output MAKE_BACKUP_status
+	    ;;
+	esac
+    fi
+
+
+    if [ "$BACKUPDO" == "1" ]
+	then
+	
+	for backup_dir in $MAKE_BACKUP_DIR_LIST
+	do
+	    $MKDIR -p $BACKUP_DIR_TMP/$backup_dir
+	    check_rv_output MAKE_BACKUP_status
+	    $CP -R $backup_dir/* $BACKUP_DIR_TMP/$backup_dir
+	    check_rv_output MAKE_BACKUP_status
+	done
+	
+
+	# PACK
+	case $MAKE_BACKUP_PACK in
+	tar)
+	    if [ ! -f "$TAR" ] 
+		then
+		$PRINT "$MSG_MISSING_COMMAND $TAR" >> $OUTPUT
+		$PRINT "$MSG_NEED_PACKAGE $TAR_package" >> $OUTPUT
+	    
+		else
+	    
+		$PRINTE "$BACKUP_DIR/$BACKUP_NAME\n" >> $OUTPUT
+		$TAR -cf $BACKUP_DIR/$BACKUP_NAME --directory $BACKUP_DIR/tmp --totals ./ 2>> $OUTPUT
+		check_rv_output MAKE_BACKUP_status
+	    fi
+	    ;;
+	gzip)
+	    if [[ ! -f "$TAR" || ! -f "$GZIP" ]]
+		then
+		$PRINT "$MSG_MISSING_COMMAND $TAR, $GZIP" >> $OUTPUT
+		$PRINT "$MSG_NEED_PACKAGE $TAR_package, $GZIP_package" >> $OUTPUT
+
+		else
+		
+		$PRINTE "$BACKUP_DIR/$BACKUP_NAME\n" >> $OUTPUT
+		$TAR -czf $BACKUP_DIR/$BACKUP_NAME --directory $BACKUP_DIR/tmp --totals ./ 2>> $OUTPUT
+		check_rv_output MAKE_BACKUP_status
+	    fi
+	    ;;
+	bzip2)
+	    if [[ ! -f "$TAR" || ! -f "$BZIP2" ]] 
+		then
+		$PRINT "$MSG_MISSING_COMMAND $TAR, $BZIP2" >> $OUTPUT
+		$PRINT "$MSG_NEED_PACKAGE $TAR_package, $BZIP2_package" >> $OUTPUT
+		let MAKE_BACKUP_status=1
+		
+		else
+		
+		$PRINTE "$BACKUP_DIR/$BACKUP_NAME\n" >> $OUTPUT
+		$TAR -cjf $BACKUP_DIR/$BACKUP_NAME --directory $BACKUP_DIR/tmp --totals ./ 2>> $OUTPUT
+		check_rv_output MAKE_BACKUP_status
+	    fi
+	    ;;
+	*)
+	    $PRINT "$MSG_BACKUP_UNSUPPORTED_PACKER" >> $OUTPUT
+	    ;;
+	esac
+	
+	else
+	$PRINTE "$MSG_BACKUP_NOT_SCHEDULED" >> $OUTPUT
+    fi
+
+
+    # REMOVE TMP DIR
+    $RM -fR $BACKUP_DIR_TMP/*
+    check_rv_output MAKE_BACKUP_status
+    $RMDIR --ignore-fail-on-non-empty $BACKUP_DIR_TMP
+    check_rv_output MAKE_BACKUP_status
+    
+    $PRINTE "\n\n" >> $OUTPUT
+
+fi

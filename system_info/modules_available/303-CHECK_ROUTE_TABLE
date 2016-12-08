@@ -1,0 +1,32 @@
+#!/bin/bash
+
+
+######## CHECK (system_info.sh -c)
+if [ $1 == "check" ]
+    then
+
+
+    ################# VARIABLES for CHECK of CHECKs :-)
+    CHECK_ROUTE_TABLE_status=0
+
+
+    ######## CHECK_ROUTE_TABLE
+    ######## ROUTE
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    $PRINTE "| $MSG_ROUTE_TABLE (# $ROUTE)" >> $OUTPUT
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    
+    if [ ! -f "$ROUTE" ] 
+	then
+	$PRINT "$MSG_MISSING_COMMAND $ROUTE" >> $OUTPUT
+	$PRINT "$MSG_NEED_PACKAGE $ROUTE_package" >> $OUTPUT
+	let CHECK_ROUTE_TABLE_status=1
+
+	else
+	$ROUTE >> $OUTPUT
+	check_rv_output CHECK_ROUTE_TABLE_status
+    fi
+
+    $PRINTE "\n\n" >> $OUTPUT
+
+fi

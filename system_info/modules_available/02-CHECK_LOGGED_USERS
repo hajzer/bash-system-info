@@ -1,0 +1,31 @@
+#!/bin/bash
+
+
+######## CHECK (system_info.sh -c)
+if [ $1 == "check" ]
+    then
+
+    
+    ################# VARIABLES for CHECK of CHECKs :-)
+    CHECK_LOGGED_USERS_status=0
+
+
+    ######## CHECK_LOGGED_USERS
+    ######## W
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    $PRINTE "| $MSG_LOGGED_USERS (# $W)" >> $OUTPUT
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    
+    if [ ! -f "$W" ]
+	then
+	$PRINT "$MSG_MISSING_COMMAND $W" >> $OUTPUT
+	$PRINT "$MSG_NEED_PACKAGE $W_package" >> $OUTPUT	
+
+	else
+	$W >> $OUTPUT
+	check_rv_output CHECK_LOGGED_USERS_status
+    fi
+    
+    $PRINTE "\n\n" >> $OUTPUT
+
+fi

@@ -1,0 +1,32 @@
+#!/bin/bash
+
+
+######## CHECK (system_info.sh -c)
+if [ $1 == "check" ]
+    then
+
+
+    ################# VARIABLES for CHECK of CHECKs :-)
+    CHECK_NETWORK_SERVICES_status=0
+
+
+    ######## CHECK_NETWORK_SERVICES
+    ######## NETSTAT
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    $PRINTE "| $MSG_NETWORK_SERVICES (# $NETSTAT $NETSTAT_p)" >> $OUTPUT
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+
+    if [ ! -f "$NETSTAT" ]
+	then
+	$PRINT "$MSG_MISSING_COMMAND $NETSTAT" >> $OUTPUT
+	$PRINT "$MSG_NEED_PACKAGE $NETSTAT_package" >> $OUTPUT
+	let CHECK_NETWORK_SERVICES_status=1
+
+	else
+	$NETSTAT $NETSTAT_p >> $OUTPUT
+	check_rv_output CHECK_NETWORK_SERVICES_status
+    fi
+
+    $PRINTE "\n\n" >> $OUTPUT
+
+fi

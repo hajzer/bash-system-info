@@ -1,0 +1,47 @@
+#!/bin/bash
+
+
+######## CHECK (system_info.sh -c)
+if [ $1 == "check" ]
+    then
+    
+    
+    ################# VARIABLES for CHECK of CHECKs :-)
+    CHECK_UPGRADE_OS_status=0
+
+
+    ######## CHECK_UPGRADE_OS
+    # WHICH DISTRO?
+    case $DISTRO in
+    debian)
+	######## APT-GET
+	$PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+	$PRINTE "| $MSG_UPGRADE_OS" >> $OUTPUT
+	$PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+
+	if which $APTGET 2>&1 >/dev/null
+	    then
+	    $APTGET update -q=2 2>&1 >> $OUTPUT
+	    check_rv_output CHECK_UPGRADE_OS_status
+	    $APTGET upgrade --show-upgraded --download-only --quiet --simulate --verbose-versions 2>&1 >> $OUTPUT
+	    check_rv_output CHECK_UPGRADE_OS_status
+	
+	    else
+	    $PRINT "$MSG_MISSING_COMMAND $APTGET" >> $OUTPUT
+	    $PRINT "$MSG_NEED_PACKAGE $APTGET_package" >> $OUTPUT
+	    let CHECK_UPGRADE_OS_status=1
+	fi
+
+	$PRINTE "\n\n" >> $OUTPUT
+	;;
+    *)
+	######## Unknown distro
+	$PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+	$PRINTE "| $MSG_UPGRADE_OS" >> $OUTPUT
+	$PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+	$PRINTE "$MSG_UNSUPPORTED_DISTRO" >> $OUTPUT
+	$PRINTE "\n\n" >> $OUTPUT
+	;;
+    esac
+
+fi
