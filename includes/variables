@@ -1,0 +1,28 @@
+#!/bin/bash
+#
+# SYSTEM_TOOLS_variables
+# ----------------------
+# Premenne, ktore sa pouzivaju v SYSTEM_TOOLS skriptoch
+# Variables used in SYSTEM_TOOLS scripts
+#
+# LALA 2009 -> lala (at) linuxor (dot) sk
+#
+
+
+# FARBY
+# COLORS
+black='\E[30;40m'
+red='\E[31;40m'
+green='\E[32;40m'
+yellow='\E[33;40m'
+blue='\E[34;40m'
+magenta='\E[35;40m'
+cyan='\E[36;40m'
+white='\E[37;40m'
+
+
+# GLOBALNE PREMENNE
+# GLOBAL VARIABLES
+NO_ARGS=0
+ERROR_CODE=1
+E_OPTERROR=65
