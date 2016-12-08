@@ -1,0 +1,143 @@
+#!/bin/bash
+#
+# SYSTEM_TOOLS_COMMANDS_redhat
+# ----------------------------
+# Definicia prikazov a ciest k prikazom + nazvy balickov, ktore obsahuju tieto prikazy v distribucii Redhat.
+# Definition of commands and paths to commands + names of packages in which are these commands in Redhat distribution.
+#
+# LALA 2009 -> lala (at) linuxor (dot) sk
+#
+
+
+# PRIKAZY				BALICEK
+# COMMANDS				PACKAGE
+# ---------------------------------------------
+ARP="/sbin/arp"				# net-tools *
+ARP_p="-a"				# net-tools *
+ARP_package="net-tools"
+AWK="/usr/bin/awk"			# gawk *
+AWK_package="gawk"
+BASENAME="/bin/basename"		# sh-utils *
+BASENAME_package="sh-utils"
+BC="/usr/bin/bc"			# bc
+BC_package="bc"
+BZIP2="/bin/bzip2"			# bzip2
+BZIP2_package="bzip2"
+CAT="/bin/cat"				# coreutils
+CAT_package="coretils"
+CP="/bin/cp"				# fileutils *
+CP_package="fileutils"
+DATE="/bin/date"			# fileutils *
+DATE_package="fileutils"
+DD="/bin/dd"				# fileutils *
+DD_package="fileutils"
+DF="/bin/df"				# fileutils *
+DF_p="-h -P -l -T"			# fileutils *
+DF_package="fileutils"
+DIRNAME="/usr/bin/dirname"		# sh-utils *
+DIRNAME_package="sh-utils"
+DPKG="/usr/bin/dpkg"			# dpkg
+DPKG_package="dpkg"
+DMESG="/bin/dmesg"			# util-linux *
+DMESG_package="util-linux"
+FIND="/usr/bin/find"			# findutils *
+FIND_package="findutils"
+FREE="/usr/bin/free"			# procps *
+FREE_p="-mto"				# procps *
+FREE_package="procps"
+FRESHCLAM="/usr/bin/freshclam"		# clamav 
+FRESHCLAM_p=""				# clamav
+FRESHCLAM_package="clamav (http://dag.wieers.com/rpm/packages/clamav/)"
+GPG="/usr/bin/gpg"			# gnupg *
+GPG_package="gnupg"
+GREP="/bin/grep"			# grep *
+GREP_p=""				# grep *
+GREP_package="grep"
+GZIP="/bin/gzip"			# gzip *
+GZIP_package="gzip"
+IFCONFIG="/sbin/ifconfig"		# net-tools *
+IFCONFIG_package="net-tools"
+IOSTAT="/usr/bin/iostat"		# sysstat *
+IOSTAT_p="-xd"				# sysstat *
+IOSTAT_package="sysstat"
+IPSEC="/usr/sbin/ipsec"			# openswan *
+IPSEC_p="auto --status"			# openswan *
+IPSEC_package="openswan"
+IPTABLESSAVE="/sbin/iptables-save"	# iptables *
+IPTABLESSAVE_package="iptables"
+LAST="/usr/bin/last"			# SysVinit *
+LAST_package="SysVinit"
+LN="/bin/ln"				# coreutils *
+LN_package="coreutils"			
+LS="/bin/ls"				# coreutils *
+LS_package="coreutils"
+LSMOD="/sbin/lsmod"			# module-init-tools *
+LSMOD_package="module-init-tools"
+LVCREATE="/usr/sbin/lvcreate"		# lvm2 *
+LVCREATE_package="lvm2"
+LVREMOVE="/usr/sbin/lvremove"		# lvm2 *
+LVMREMOVE_package="lvm2"
+LVS="/usr/sbin/lvs"			# lvm2 *
+LVS_p="--units M -o +devices"		# lvm2 *
+LVS_package="lvm2"
+MAIL="/bin/mail"			# mailx *
+MAIL_package="mailx"
+MAILQ="/usr/bin/mailq"			# postfix, sendmail, exim ... *
+MAILQ_package="postfix, sendmail, exim ..."
+MD5SUM="/usr/bin/md5sum"		# coreutils *
+MD5SUM_package="md5sum"
+MKDIR="/bin/mkdir"			# coreutils *
+MKDIR_package="coreutils"
+MKSWAP="/sbin/mkswap"			# util-linux *
+MKSWAP_package="utils-linux"
+MOUNT="/bin/mount"			# util-linux *
+MOUNT_p=""				# util-linux *
+MOUNT_package="util-linux"
+MPSTAT="/usr/bin/mpstat"		# sysstat *
+MPSTAT_p="-P ALL"			# sysstat *
+MPSTAT_package="sysstat"
+NETSTAT="/bin/netstat"			# net-tools *
+NETSTAT_p="-tunpl"			# net-tools *
+NETSTAT_package="net-tools"	
+NULL="/dev/null"			
+PRINT="/bin/echo"			# coreutils *
+PRINT_package="coreutils"
+PRINTE="/bin/echo -e"			# coreutils *
+PS="/bin/ps"				# procps *
+PS_p=""					# procps *
+PS_package="procps"
+PVS="/usr/sbin/pvs"			# lvm2 *
+PVS_p="--units M"			# lvm2 *
+PVS_package="lvm2"
+READLINK="/usr/bin/readlink"		# coreutils *
+READLINK_package="coreutils"
+RESET="/usr/bin/tput sgr0"		# ncurses *
+RESET_package="ncurses"
+RM="/bin/rm"				# coreutils *
+RM_package="coreutils"
+RMDIR="/bin/rmdir"			# coreutils *
+RMDIR_package="coreutils"
+ROUTE="/sbin/route"			# net-tools *
+ROUTE_package="net-tools"
+SED="/bin/sed"				# sed *
+SED_package="sed"
+SHA1SUM="/usr/bin/sha1sum"		# coreutils *
+SHA1SUM_package="coreutils"
+SORT="/bin/sort"			# coreutils *
+SORT_package="coreutils"
+TAIL="/usr/bin/tail"			# coreutils *
+TAIL_package="coreutils"
+TAR="/bin/tar"				# tar *
+TAR_package="tar"
+TOUCH="/bin/touch"			# coreutils *
+TOUCH_package="coreutils"
+UPTIME="/usr/bin/uptime"		# procps *
+UPTIME_package="procps"
+W="/usr/bin/w"				# procps *
+W_package="procps"
+WC="/usr/bin/wc"			# coreutils *
+WC_package="coreutils"
+XM="/usr/sbin/xm"			# xen *
+XM_package="xen"
+YUM="/usr/bin/yum"			# yum *
+YUM_package="yum"
