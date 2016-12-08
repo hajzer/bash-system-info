@@ -1,0 +1,134 @@
+#!/bin/bash
+
+
+######## CHECK (system_info.sh -c)
+if [ $1 == "check" ]
+    then 
+
+
+    ################# VARIABLES for CHECK of CHECKs :-)
+    CHECK_BASIC_INFO_status=0
+
+
+    ######## INTRO
+    $PRINT  "+=================================================================================>" >> $OUTPUT
+    $PRINTE "| SYSTEM INFO v$VERSION: $HOST                                                     " >> $OUTPUT
+    $PRINTE "| Author: $AUTHOR                                                                  " >> $OUTPUT
+    $PRINTE "| $(date +'%b %d %k:%M:%S')                                                        " >> $OUTPUT
+    $PRINT  "+=================================================================================>" >> $OUTPUT
+    $PRINTE "\n\n" >> $OUTPUT
+
+
+    if [[ ! -f "$CAT" || ! -f "/proc/version" ]]
+	then
+	$PRINT "$MSG_MISSING_COMMAND $CAT, /proc/version" >> $OUTPUT
+	$PRINT "$MSG_NEED_PACKAGE $CAT_package" >> $OUTPUT
+	let CHECK_BASIC_INFO_status=1
+	
+	else
+	######## CHECK_BASIC_INFO
+	######## BASE INFO
+	system="$($CAT /proc/version)"
+	check_rv_output CHECK_BASIC_INFO_status
+    fi
+
+
+    if [[ ! -f "$UPTIME" || ! -f "$GREP" || ! -f "$AWK" || ! -f "$SED" ]]
+	then
+	$PRINT "$MSG_MISSING_COMMAND $UPTIME, $GREP, $AWK, $SED" >> $OUTPUT
+	$PRINT "$MSG_NEED_PACKAGE $UPTIME_package, $GREP_package, $AWK_package, $SED_package" >> $OUTPUT
+	let CHECK_BASIC_INFO_status=1
+	
+	else
+	######## UPTIME
+	uptime="$($UPTIME)"
+	check_rv_output CHECK_BASIC_INFO_status
+	if $($PRINT $uptime | $GREP -E "min|days" >/dev/null)
+	    then
+	    x=$($PRINT $uptime | $AWK '{ print $3 $4}')
+	    check_rv_output CHECK_BASIC_INFO_status
+	
+	    else
+	    x=$($PRINT $uptime | $SED s/,//g| $AWK '{ print $3 " (hh:mm)"}')
+	    check_rv_output CHECK_BASIC_INFO_status
+	fi
+
+	uptime="$x"
+	check_rv_output CHECK_BASIC_INFO_status
+
+
+	######## PRIEMERNA VYTAZENOST
+	rload="$($UPTIME | awk -F'average:' '{ print $2}')"
+	check_rv_output CHECK_BASIC_INFO_status
+	x="$($PRINT $rload | sed s/,//g | awk '{ print $2}')"
+	check_rv_output CHECK_BASIC_INFO_status
+	y="$($PRINT "$x >= $LOAD_WARN" | bc)"
+	check_rv_output CHECK_BASIC_INFO_status
+	[ "$y" == "1" ] && rload="$rload (High) $NOC" || rload="$rload (Ok) $NOC"
+	check_rv_output CHECK_BASIC_INFO_status
+    fi
+
+
+    if [[ ! -f "$PS" || ! -f "$FREE" || ! -f "$GREP" || ! -f "$AWK" || ! -f "$SED" ]]
+	then
+	$PRINT "$MSG_MISSING_COMMAND $PS, $FREE, $GREP, $AWK, $SED" >> $OUTPUT
+	$PRINT "$MSG_NEED_PACKAGE $PS_package, $FREE_package, $GREP_package, $AWK_package, $SED_package" >> $OUTPUT
+	let CHECK_BASIC_INFO_status=1
+	
+	else
+	######## CELKOVY POCET PROCESOV
+	totalprocess="$($PS axue | $GREP -vE "^USER|grep|ps" | $WC -l)"
+	check_rv_output CHECK_BASIC_INFO_status
+
+
+	######## PAMAT
+	usedram="$($FREE $FREE_p | $GREP Mem: | $AWK '{ print $3 " MB" }')"
+	check_rv_output CHECK_BASIC_INFO_status
+	freeram="$($FREE $FREE_p | $GREP Mem: | $AWK '{ print $4 " MB" }')"
+	check_rv_output CHECK_BASIC_INFO_status
+	totalram="$($FREE $FREE_p | $GREP Mem: | $AWK '{ print $2 " MB" }')"
+	check_rv_output CHECK_BASIC_INFO_status
+
+
+	######## SWAP
+	usedswap="$($FREE $FREE_p | $GREP Swap: | $AWK '{ print $3 " MB" }')"
+	check_rv_output CHECK_BASIC_INFO_status
+	freeswap="$($FREE $FREE_p | $GREP Swap: | $AWK '{ print $4 " MB" }')"
+	check_rv_output CHECK_BASIC_INFO_status
+	totalswap="$($FREE $FREE_p | $GREP Swap: | $AWK '{ print $2 " MB" }')"
+	check_rv_output CHECK_BASIC_INFO_status
+    fi
+
+
+    if [[ ! -f "$CAT" || ! -f "$TAIL" || ! -f "$GREP" || ! -f "$AWK" || ! -f "/proc/cpuinfo" ]]
+	then
+	$PRINT "$MSG_MISSING_COMMAND $CAT, $TAIL, $GREP, $AWK, /proc/cpuinfo" >> $OUTPUT
+	$PRINT "$MSG_NEED_PACKAGE $CAT_package, $TAIL_package, $GREP_package, $AWK_package" >> $OUTPUT
+	let CHECK_BASIC_INFO_status=1
+	
+	else
+	######## NUMBER OF CPUs
+	cpu_num=`$CAT /proc/cpuinfo | $GREP -c vendor_id`
+
+	######## PROCESOR
+	cpumodel=`$CAT /proc/cpuinfo | $GREP vendor_id | $AWK -F\: '{print $2}' | $TAIL -n 1`
+	check_rv_output CHECK_BASIC_INFO_status
+	cpuname=`$CAT /proc/cpuinfo  | $GREP -e "^model name" | $AWK -F\: '{print $2}' | $TAIL -n 1`
+	check_rv_output CHECK_BASIC_INFO_status
+	cpuspeed=`$CAT /proc/cpuinfo | $GREP MHz | $AWK -F\: '{print $2}' | $AWK -F\. '{print $1}' | $TAIL -n 1`
+	check_rv_output CHECK_BASIC_INFO_status
+
+
+	$PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+	$PRINTE "| $MSG_BASIC_INTRO                                                                 " >> $OUTPUT
+	$PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+	$PRINT  "$MSG_BASIC_SYSTEM: $system" >> $OUTPUT
+	$PRINT  "$MSG_BASIC_UPTIME: $uptime" >> $OUTPUT
+	$PRINT  "$MSG_BASIC_AVERAGE_SYSTEM_USAGE: $rload" >> $OUTPUT
+	$PRINT  "$MSG_BASIC_NUMBER_OF_PROCESSES: $totalprocess" >> $OUTPUT
+	$PRINTE "$MSG_BASIC_CPU: $cpu_num X $cpumodel $cpuname $cpuspeed MHz" >> $OUTPUT
+	$PRINT  "$MSG_BASIC_TOTALRAM: $totalram, $MSG_BASIC_USEDRAM: $usedram, $MSG_BASIC_FREERAM: $freeram        " >> $OUTPUT
+	$PRINT  "$MSG_BASIC_TOTALSWAP: $totalswap, $MSG_BASIC_USEDSWAP: $usedswap, $MSG_BASIC_FREESWAP: $freeswap  " >> $OUTPUT
+	$PRINTE "\n\n" >> $OUTPUT
+    fi
+fi    
