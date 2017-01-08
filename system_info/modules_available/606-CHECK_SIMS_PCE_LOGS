@@ -1,0 +1,43 @@
+#!/bin/bash
+#
+######## CONFIGURATION
+
+LOG_PATH="/var/log/pce"
+TODAY="`(date +%Y%m%d)`"
+
+######## CHECK (system_info.sh -c)
+if [ $1 == "check" ]
+    then
+    
+    
+    ################# VARIABLES for CHECK of CHECKs :-)
+    CHECK_SIMS_PCE_LOGS_status=0
+
+
+    ################# CHECK_SIMS_ERROR_LOGS
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    $PRINTE "| CHECK PCE LOGS" >> $OUTPUT
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+
+
+    if [[ ! -f "$PS"  || ! -f "$GREP" || ! -f "$AWK" || ! -f "$FIND" || ! -f "$TAIL" ]] 
+	then
+	$PRINT "$MSG_MISSING_COMMAND $PS, $GREP, $AWK, $FIND, $TAIL" >> $OUTPUT
+	$PRINT "$MSG_NEED_PACKAGE $PS_package, $GREP_package, $AWK_package, $FIND_package, $TAIL_package" >> $OUTPUT
+	let CHECK_SIMS_PCE_LOGS_status=1
+
+	else 
+
+	# ARCHIVATOR LOG
+	$PRINT "+--------------------------------------------------------------------------------->" >> $OUTPUT
+	$PRINT "| ARCHIVATOR LOG" >> $OUTPUT
+	$PRINT "+--------------------------------------------------------------------------------->" >> $OUTPUT
+	$TAIL -n 25 $LOG_PATH/ARCHIVATOR.log >> $OUTPUT
+	check_rv_output CHECK_SIMS_PCE_LOGS_status
+	$PRINT "" >> $OUTPUT
+
+
+    fi
+    $PRINTE "\n\n" >> $OUTPUT
+
+fi
