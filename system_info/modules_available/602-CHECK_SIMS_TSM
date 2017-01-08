@@ -1,0 +1,67 @@
+#!/bin/bash
+
+
+######## CONFIGURATION
+
+
+# Date of check
+# today | yesterday
+# -----------------
+CHECK_DATE="yesterday"
+
+# TSM log
+# -------
+TSM_LOG="/tsm/logs/unxsched.log"
+
+
+######## CONFIGURATION
+
+
+######## CHECK (system_info.sh -c)
+if [ $1 == "check" ]
+    then
+    
+    
+    ################# VARIABLES for CHECK of CHECKs :-)
+    CHECK_SIMS_TSM_status=0
+
+
+    ######## CHECK_SIMS_TSM
+    ######## 
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    $PRINTE "| $MSG_SIMS_TSM"  >> $OUTPUT
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+
+    if [[ ! -f "$DATE" || ! -f "$GREP" || ! -f "$AWK" ]]
+	then
+	$PRINT "$MSG_MISSING_COMMAND $DATE, $GREP, $AWK" >> $OUTPUT
+	$PRINT "$MSG_NEED_PACKAGE $DATE_package, $GREP_package, $AWK_package" >> $OUTPUT
+	let CHECK_SIMS_TSM_status=1
+
+        # DATE of CHECK
+	else
+
+        case $CHECK_DATE in
+        today)
+             checkdate=`$DATE +%m/%d/%Y`
+             check_rv_output CHECK_SIMS_TSM_status
+             ;;
+        yesterday)
+             checkdate=`$DATE -d 'yesterday' +%m/%d/%Y`
+             check_rv_output CHECK_SIMS_TSM_status
+             ;;
+        *)
+             $PRINT "$MSG_SIMS_TSM_CONFIGURATION_ERROR" >> $OUTPUT
+             let CHECK_SIMS_TSM_status=1
+             ;;
+        esac
+
+
+	$AWK -v date=$checkdate '$1==date {print}' $TSM_LOG | $GREP Scheduled >> $OUTPUT
+	check_rv_output CHECK_SIMS_TSM_status
+
+    fi
+
+    $PRINTE "\n\n" >> $OUTPUT
+
+fi

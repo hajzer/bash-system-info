@@ -1,0 +1,82 @@
+#!/bin/bash
+#
+######## CONFIGURATION
+
+# list of checked processes
+# -------------------------
+CHECK_SIMS_ERROR_MSG_LIST="Unauthorized_access_denied"
+
+LOG_PATH="/data/home/nfadmin/logs"
+CHECK_LOG_ADDR="agents
+servers"
+
+ERROR_status=0
+
+TODAY="`(date +%Y%m%d)`"
+
+######## CHECK (system_info.sh -c)
+if [ $1 == "check" ]
+    then
+    
+    
+    ################# VARIABLES for CHECK of CHECKs :-)
+    CHECK_SIMS_ERROR_LOGS_status=0
+
+
+    ################# CHECK_SIMS_ERROR_LOGS
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    $PRINTE "| $MSG_SIMS_ERROR_LOGS" >> $OUTPUT
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+
+
+    if [[ ! -f "$PS"  || ! -f "$GREP" || ! -f "$AWK" || ! -f "$FIND" ]] 
+	then
+	$PRINT "$MSG_MISSING_COMMAND $PS, $GREP, $AWK, $FIND" >> $OUTPUT
+	$PRINT "$MSG_NEED_PACKAGE $PS_package, $GREP_package, $AWK_package, $FIND_package" >> $OUTPUT
+	let CHECK_SIMS_ERROR_LOGS_status=1
+
+	else 
+
+	# prejst adresare s log files (pr: servers; agents)
+	for addr in $CHECK_LOG_ADDR
+	do
+		path="$LOG_PATH/$addr"
+		if [ -d $path ];
+			then
+
+			# najst err files za aktualny den (podla datumu poslednej upravy)
+			for err_log in `$FIND "$path" -type f -mtime -1 -print | $GREP "err.log$"`
+			do
+				# najst prvy riadok s aktualnym datumom
+				start=`$AWK '/'$TODAY'/ {print FNR;exit}' "$err_log"`
+				
+				if [ "$start" != "" ]
+				then
+					# vyhladat chybovu hlasku od najdeneho riadku
+					for err_msg in $CHECK_SIMS_ERROR_MSG_LIST
+					do
+						search=`$PRINT "$err_msg" | sed 's/_/ /g'`
+						result=`$AWK 'BEGIN { count=0; } FNR>='$start' && /'"$search"'/ { count++; } END { print count;}' "$err_log"`
+						#check_rv_output CHECK_SIMS_ERROR_LOGS_status
+
+						    if [ "$result" != 0 ]
+							then
+							$PRINTE "$err_log :\t$err_msg :\t[-- $result --]" >> $OUTPUT
+							#check_rv_output CHECK_SIMS_ERROR_LOGS_status
+							let ERROR_status=1
+						    fi
+					done
+				fi
+			done
+		fi
+	done
+
+	if [ $ERROR_status == 0 ]
+	then
+		$PRINT "$MSG_SIMS_NO_ERROR_LOGS" >> $OUTPUT
+	fi
+
+    fi
+    $PRINTE "\n\n" >> $OUTPUT
+
+fi

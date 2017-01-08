@@ -1,0 +1,74 @@
+#!/bin/bash
+# 
+######## CONFIGURATION
+
+# list of checked processes
+# -------------------------
+CHECK_SIMS_CUSTOM_AGENTS="nfqcua20001
+nfqcua20002
+nfqcua20003
+nfqcua20004
+nfqcua20005
+nfqcua20006
+nfqcua20007
+nfqcua20008
+nfqcua20009
+nfqcua20011
+nfqcua20012
+nfqcua20015
+nfqcua20016
+nfqcua20017"
+
+
+LOCK_ADDR_PATH="/data/home/nfadmin/logs/locks"
+
+TODAY="`(date +%Y%m%d)`"
+
+######## CHECK (system_info.sh -c)
+if [ $1 == "check" ]
+    then
+    
+    
+    ################# VARIABLES for CHECK of CHECKs :-)
+    CHECK_SIMS_ERROR_LOGS_status=0
+
+
+    ################# CHECK_SIMS_EVENT_COLLECTING
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    $PRINTE "| $MSG_SIMS_EVENT_COLLECTING" >> $OUTPUT
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+
+
+    if [[ ! -f "$PS"  || ! -f "$GREP" || ! -f "$AWK" || ! -f "$FIND" ]] 
+	then
+	$PRINT "$MSG_MISSING_COMMAND $PS, $GREP, $AWK, $FIND" >> $OUTPUT
+	$PRINT "$MSG_NEED_PACKAGE $PS_package, $GREP_package, $AWK_package, $FIND_package" >> $OUTPUT
+	let CHECK_SIMS_ERROR_LOGS_status=1
+
+	else
+
+	if [ -d $LOCK_ADDR_PATH ]
+	then
+
+		# kontrola ci ma agent *.Lock subor
+		for agent in $CHECK_SIMS_CUSTOM_AGENTS
+		do
+			lock=`$FIND "$LOCK_ADDR_PATH" -type f -maxdepth 1 -iname "*$agent*" | $GREP ".Lock$"`
+			if [ "$lock" != "" ]
+			then
+				# agent ma prisluchajuci *.Lock subor
+				grep_date=`$GREP -o -e '[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}' "$lock"`
+				grep_time=`$GREP -o -e '[0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}' "$lock"`
+				$PRINT "$agent: $grep_date | $grep_time" >> $OUTPUT
+
+			else
+				# agent nema prisluchajuci *.Lock subor
+				$PRINT "$agent: $MSG_SIMS_NO_LOCK_FILE" >> $OUTPUT
+
+			fi
+		done
+	fi
+    fi
+    $PRINTE "\n\n" >> $OUTPUT
+
+fi

@@ -1,0 +1,43 @@
+#!/bin/bash
+
+PLOTS=$INSTALL_DIR/includes/plot
+
+
+######## CHECK (system_info.sh -c)
+if [ $1 == "check" ]
+    then
+
+    
+    ################# VARIABLES for CHECK of CHECKs :-)
+    PLOT_CPU_status=0
+
+
+    ######## PLOT_CPU_stats
+    ######## 
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    $PRINTE "| CPU STATS" >> $OUTPUT
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    
+#    if [ ! -f "$W" ]
+#	then
+#	$PRINT "$MSG_MISSING_COMMAND $W" >> $OUTPUT
+#	$PRINT "$MSG_NEED_PACKAGE $W_package" >> $OUTPUT	
+
+#	else
+#	$W >> $OUTPUT
+#	check_rv_output CHECK_LOGGED_USERS_status
+#   fi
+
+
+#    LC_TIME="POSIX" sar >$WORKDIR/plot_cpu.txt
+    LC_TIME="POSIX" sar -P ALL | egrep -v "^[[:space:]]*$|^#" | grep -v CPU | grep -v all | grep -v Average | awk 'NR != 1 {x[$1] += $3} END{ for(z in x) {print z, x[z]"%"}}'|sort>$WORKDIR/plot_cpu_user.txt
+    LC_TIME="POSIX" sar -P ALL | egrep -v "^[[:space:]]*$|^#" | grep -v CPU | grep -v all | grep -v Average | awk 'NR != 1 {x[$1] += $5} END{ for(z in x) {print z, x[z]"%"}}'|sort>$WORKDIR/plot_cpu_system.txt
+    LC_TIME="POSIX" sar -P ALL | egrep -v "^[[:space:]]*$|^#" | grep -v CPU | grep -v all | grep -v Average | awk 'NR != 1 {x[$1] += $6} END{ for(z in x) {print z, x[z]"%"}}'|sort>$WORKDIR/plot_cpu_iowait.txt
+    LC_TIME="POSIX" sar -P ALL | egrep -v "^[[:space:]]*$|^#" | grep -v CPU | grep -v all | grep -v Average | awk 'NR != 1 {x[$1] += $7} END{ for(z in x) {print z, x[z]"%"}}'|sort>$WORKDIR/plot_cpu_idle.txt
+
+    $PLOTS/plot_cpu_iowait.pg >$WORKDIR/plot_cpu_iowait_out.txt
+    $CAT $WORKDIR/plot_cpu_iowait_out.txt >> $OUTPUT
+
+    $PRINTE "\n\n" >> $OUTPUT
+
+fi

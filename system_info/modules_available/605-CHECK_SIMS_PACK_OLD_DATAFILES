@@ -1,0 +1,79 @@
+#!/bin/bash
+#
+######## CONFIGURATION
+
+# Mon | Tue | Wed | Thu | Fri | Sat | Sun
+# -------------------------
+PACK_INTERVAL="Mon
+Tue
+Wed
+Thu
+Fri"
+
+# zoznam addr. na vyhladanie suborov vhodnych pre komprimaciu
+# -------------------------
+PACK_ADDR_PATH="/data/logs_ha"
+
+# po ktory datum vykonat komprimaciu?
+# -------------------------
+STOP_DATE=`$DATE --date="yesterday" +%Y%m%d`
+
+# dnes je den?
+# -------------------------
+DAY=`$DATE | $AWK '{ print $1 }'`
+#DAYINT=`$DATE | $AWK '{ print $3 }'`
+#MONTH=`$DATE | $AWK '{ print $2 }'`
+
+######## CHECK (system_info.sh -c)
+if [ $1 == "check" ]
+    then
+    
+    ################# VARIABLES for CHECK of CHECKs :-)
+    CHECK_SIMS_ERROR_LOGS_status=0
+
+
+    ################# CHECK_SIMS_PACK_OLD_DATAFILES
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    $PRINTE "| $MSG_SIMS_PACK_OLD_DATAFILES" >> $OUTPUT
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+
+
+    if [[ ! -f "$GREP" || ! -f "$AWK" || ! -f "$FIND" ]] 
+    then
+	$PRINT "$MSG_MISSING_COMMAND $RM, $GREP, $AWK, $FIND" >> $OUTPUT
+	$PRINT "$MSG_NEED_PACKAGE $RM_package, $GREP_package, $AWK_package, $FIND_package" >> $OUTPUT
+	let CHECK_SIMS_ERROR_LOGS_status=1
+
+    else
+
+	for addr in $PACK_ADDR_PATH
+	do
+
+		if [ -d "$addr" ]
+		then
+			for day2do in $PACK_INTERVAL
+			do
+				if [ "$DAY" == "$day2do" ]
+				then
+					i=0
+					files=`$FIND "$addr" -type f -exec ls -ltR --time-style=+%Y%m%d {} \; | $GREP ".log$" | $AWK '$6<="'"$STOP_DATE"'" { print "gzip "$7}'|sh`
+					if [ "$files" != "" ]
+					then
+						for pack_files in $files
+						do
+							let i=$i+1
+						done
+					fi
+				fi
+			done
+		else
+			$PRINT "$addr: $MSG_SIMS_FOLDER_NOT_FOUND" >> $OUTPUT
+		fi
+
+		$PRINT "$MSG_SIMS_PACK_COUNT_FILES [ $addr ] : $i " >> $OUTPUT
+
+	done
+    fi
+    $PRINTE "\n\n" >> $OUTPUT
+
+fi

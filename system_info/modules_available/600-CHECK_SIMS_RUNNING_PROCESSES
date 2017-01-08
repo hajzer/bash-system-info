@@ -1,0 +1,66 @@
+#!/bin/bash
+
+
+######## CONFIGURATION
+
+# list of checked processes
+# -------------------------
+CHECK_SIMS_RUNNING_PROCESSES_LIST="nfrcm
+nfprovider
+nfdb"
+
+######## CONFIGURATION
+
+######## CHECK (system_info.sh -c)
+if [ $1 == "check" ]
+    then
+    
+    
+    ################# VARIABLES for CHECK of CHECKs :-)
+    CHECK_SIMS_RUNNING_PROCESSES_status=0
+
+
+    ################# CHECK_SIMS_RUNNING_PROCESSES
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    $PRINTE "| $MSG_SIMS_RUNNING_PROCESSES" >> $OUTPUT
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+
+
+    if [[ ! -f "$PS"  || ! -f "$GREP" || ! -f "$AWK" ]] 
+	then
+	$PRINT "$MSG_MISSING_COMMAND $PS, $GREP, $AWK, $NFSS" >> $OUTPUT
+	$PRINT "$MSG_NEED_PACKAGE $PS_package, $GREP_package, $AWK_package" >> $OUTPUT
+	let CHECK_SIMS_RUNNING_PROCESSES_status=1
+
+	else 
+    
+	for process in $CHECK_SIMS_RUNNING_PROCESSES_LIST
+	do
+
+	    running=`$PS xa | $GREP $process | $GREP -v grep | $AWK '{ print $NF }' | $GREP -e $process`
+	    check_rv_output CHECK_SIMS_RUNNING_PROCESSES_status
+	
+	    if [ "$running" != "" ]
+		then    
+		$PRINT "$MSG_RUNNING_PROCESSES_RUNNING $process" >> $OUTPUT
+		check_rv_output CHECK_SIMS_RUNNING_PROCESSES_status
+		else
+		$PRINT "$MSG_RUNNING_PROCESSES_NOTRUNNING $process" >> $OUTPUT 
+		check_rv_output CHECK_SIMS_RUNNING_PROCESSES_status
+	    fi
+
+	done
+
+	################# CHECK_SIMS_RUNNING_PROCESSES_NFSERVICES
+	$PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+	$PRINTE "| $MSG_SIMS_RUNNING_PROCESSES_NFSERVICES" >> $OUTPUT
+	$PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+
+	nfss=`$NFSS`
+	nfss=`$PRINT "$nfss" | $AWK '{gsub(/Executing nfservices as "root"/,"");print}' | $AWK 'NF > 0'`
+	$PRINT "$nfss" >> $OUTPUT
+
+    fi
+    $PRINTE "\n\n" >> $OUTPUT
+
+fi

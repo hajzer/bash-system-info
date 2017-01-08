@@ -1,0 +1,148 @@
+#!/bin/bash
+#
+######## CONFIGURATION
+
+# list of checked processes
+# -------------------------
+
+#
+# Mon | Tue | Wed | Thu | Fri | Sat | Sun = this day weekly
+# -------------------------
+REMOVE_INTERVAL="Thu"
+
+# interval: filesFolder_mounthInterval
+CHECK_SIMS_INTERVAL="B_1
+L_2"
+
+# B: backup files
+B_ADDR_PATH="/data/logs_ha"
+
+# L: log files
+L_ADDR_PATH="/data/home/nfadmin/data/backup"
+
+START_DATE=20090101
+
+######## CHECK (system_info.sh -c)
+if [ $1 == "check" ]
+    then
+    
+    
+    ################# VARIABLES for CHECK of CHECKs :-)
+    CHECK_SIMS_ERROR_LOGS_status=0
+
+
+    ################# CHECK_SIMS_REMOVE_OLD_DATAFILES
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+    $PRINTE "| $MSG_SIMS_REMOVE_OLD_DATAFILES" >> $OUTPUT
+    $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+
+
+    if [[ ! -f "$RM"  || ! -f "$GREP" || ! -f "$AWK" || ! -f "$FIND" ]] 
+    then
+	$PRINT "$MSG_MISSING_COMMAND $RM, $GREP, $AWK, $FIND" >> $OUTPUT
+	$PRINT "$MSG_NEED_PACKAGE $RM_package, $GREP_package, $AWK_package, $FIND_package" >> $OUTPUT
+	let CHECK_SIMS_ERROR_LOGS_status=1
+
+    else
+
+	for interval in $CHECK_SIMS_INTERVAL
+	do
+		# interval folder
+		tmp_f=`$PRINT "$interval" | $AWK -F_ '{print $1}'`
+		eval "addr=\$${tmp_f}_ADDR_PATH"
+
+		# interval month
+		tmp_m=`$PRINT "$interval" | $AWK -F_ '{print $2}'`
+		# stop date
+		STOP_DATE=`$DATE --date="-$tmp_m month" +%Y%m%d`
+
+		if [ -d "$addr" ]
+		then
+
+			files=`$FIND $addr -type f -exec ls -l --time-style=full-iso {} \; | $AWK '{print $6,$NF,$5}' | $AWK '{gsub(/-/,"",$1);print}' | $AWK 'BEGIN { size=0; count=0 } $1>='$START_DATE' && $1<='$STOP_DATE' { size+=$3; count++; } END {split("B KB MB GB TB PB",type); if(size > 0){for(i=5;y < 1;i--) y = size / (2**(10*i));} else { y = size; i = -1; } print "files count: " count " size: " y type[i+2]}'`
+
+			if [ "$files" != "" ]
+			then
+				$PRINT "$addr [$STOP_DATE]: $files" >> $OUTPUT
+			fi
+
+			# Today is?
+			Day=`$DATE | $AWK '{ print $1 }'`
+
+			# WHEN DO REMOVE?
+			case $REMOVE_INTERVAL in
+			daily)
+				RMDO=1
+				check_rv_output MAKE_REMOVE_status
+			;;
+			Mon)
+			if [ "$Day" == "Mon" ]
+			then
+				RMDO=1
+				check_rv_output MAKE_REMOVE_status
+				fi
+			;;
+			Tue)
+			if [ "$Day" == "Tue" ]
+			then
+				RMDO=1
+				check_rv_output MAKE_REMOVE_status
+				fi
+			;;
+			Wed)
+			if [ "$Day" == "Wed" ]
+			then
+				RMDO=1
+				check_rv_output MAKE_REMOVE_status
+			fi
+			;;
+			Thu)
+			if [ "$Day" == "Thu" ]
+			then
+				RMDO=1
+				check_rv_output MAKE_REMOVE_status
+			fi
+			;;
+			Fri)
+			if [ "$Day" == "Fri" ]
+			then
+				RMDO=1
+				check_rv_output MAKE_REMOVE_status
+			fi
+			;;
+			Sat)
+			if [ "$Day" == "Sat" ]
+			then
+				RMDO=1
+				check_rv_output MAKE_REMOVE_status
+			fi
+			;;
+			Sun)
+			if [ "$Day" == "Sun" ]
+			then
+				RMDO=1
+				check_rv_output MAKE_REMOVE_status
+			fi
+			;;
+			*)
+				$PRINT "$MSG_REMOVE_BAD_TIME"
+				RMDO=0
+				check_rv_output MAKE_REMOVE_status
+			;;
+			esac
+
+			if [ "$RMDO" == "1" ]
+			then
+				remove=`find $addr -type f -exec ls -lh --time-style=full-iso {} \; | $AWK '{print $6,$NF,$5}' | $AWK '{gsub(/-/,"",$1);print}' | $AWK '$1>='$START_DATE' && $1<='$STOP_DATE' {print "rm "$2}'|sh`
+				$PRINT "$addr : [$STOP_DATE] : -- odstranene --" >> $OUTPUT
+			fi
+
+
+		else
+			$PRINT "$addr: $MSG_SIMS_FOLDER_NOT_FOUND" >> $OUTPUT
+		fi
+	done
+    fi
+    $PRINTE "\n\n" >> $OUTPUT
+
+fi
