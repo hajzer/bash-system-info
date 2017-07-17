@@ -72,13 +72,13 @@
 
 
 # Install dir
-INSTALL_DIR=/tools/
+INSTALL_DIR=/tools
 
 # Stroj z ktoreho robime report
 # Host from which we do report
 HOST=brana.domena.sk
 
-# distro (debian | redhat)
+# distro (debian | redhat | suse)
 DISTRO=redhat
 
 # jazyk / language ( sk | en )
@@ -143,6 +143,9 @@ debian)
 ;;
 redhat)	
 . $INSTALL_DIR/includes/redhat/commands
+;;
+suse)
+. $INSTALL_DIR/includes/suse/commands
 ;;
 *)
 . $INSTALL_DIR/includes/debian/commands
