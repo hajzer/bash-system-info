@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# SYSTEM_TOOLS_COMMANDS_redhat
+# SYSTEM_TOOLS_COMMANDS_suse
 # ----------------------------
 # Definicia prikazov a ciest k prikazom + nazvy balickov, ktore obsahuju tieto prikazy v distribucii SuSE.
 # Definition of commands and paths to commands + names of packages in which are these commands in SuSE distribution.
@@ -137,5 +137,5 @@ WC="/usr/bin/wc"                        # coreutils *
 WC_package="coreutils"
 XM="/usr/sbin/xm"                       # xen 
 XM_package="xen"
-ZYPP="/usr/bin/zypper"                  # yum *  
+ZYPP="/usr/bin/zypper"                  # zypper *  
 ZYPP_package="zypper"
