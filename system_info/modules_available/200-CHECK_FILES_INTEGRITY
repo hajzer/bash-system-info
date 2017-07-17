@@ -5,8 +5,7 @@
 
 # dir(s) for file integrity check
 # -------------------------------
-CHECK_FILES_INTEGRITY_DIR="/etc/logrotate.d
-/etc/"
+CHECK_FILES_INTEGRITY_DIR="/etc"
 
 ######## CONFIGURATION
 
@@ -20,15 +19,15 @@ CHECK_FILES_INTEGRITY_DIR="/etc/logrotate.d
 	for dir in $CHECK_FILES_INTEGRITY_DIR
 	do
 	
-	    for file in `"$FIND" $dir -type f`
+	    $FIND $dir -type f | while read file
 	    do
 		if [ ! -f "$HASH_FILES_DIR$file" ]
 		    then
-		    FILENAME=`"$BASENAME" "$file"`
-		    DIRECTORYNAME=`"$DIRNAME" "$file"`
-		    $MKDIR -p $HASH_FILES_DIR$DIRECTORYNAME
-		    $TOUCH $HASH_FILES_DIR$DIRECTORYNAME/$FILENAME
-		    sha1sum "$file" | $AWK '{ print $1 }' >$HASH_FILES_DIR$DIRECTORYNAME/$FILENAME
+		    FILENAME=`$BASENAME "$file"`
+		    DIRECTORYNAME=`$DIRNAME "$file"`
+		    $MKDIR -p "$HASH_FILES_DIR$DIRECTORYNAME"
+		    $TOUCH "$HASH_FILES_DIR$DIRECTORYNAME/$FILENAME"
+		    $SHA1SUM "$file" | $AWK '{ print $1 }' > "$HASH_FILES_DIR$DIRECTORYNAME/$FILENAME"
 		fi
 	    done
 	done
@@ -61,18 +60,18 @@ if [ "$1" == "check" ]
         for dir in $CHECK_FILES_INTEGRITY_DIR
         do
 	
-    	    for file in `$FIND $dir -type f`
+    	    while read file
 	    do
 
 	    if [ -f "$HASH_FILES_DIR$file" ]
 		then
-		FILENAME=`$BASENAME $file`
+		FILENAME=`$BASENAME "$file"`
 		check_rv_output CHECK_FILES_INTEGRITY_status
-		DIRECTORYNAME=`$DIRNAME $file`
+		DIRECTORYNAME=`$DIRNAME "$file"`
 		check_rv_output CHECK_FILES_INTEGRITY_status
-		file_sha1_init=`$CAT $HASH_FILES_DIR$DIRECTORYNAME/$FILENAME`
+		file_sha1_init=`$CAT "$HASH_FILES_DIR$DIRECTORYNAME/$FILENAME"`
 		check_rv_output CHECK_FILES_INTEGRITY_status
-		file_sha1_current=`$SHA1SUM $file | $AWK '{ print $1 }'`
+		file_sha1_current=`$SHA1SUM "$file" | $AWK '{ print $1 }'`
 		check_rv_output CHECK_FILES_INTEGRITY_status
 		    
 	    
@@ -87,7 +86,7 @@ if [ "$1" == "check" ]
 		    ;;
 		esac
 	    fi
-    	    done
+    	    done < <($FIND $dir -type f)
 	done
     fi
     
