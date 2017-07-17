@@ -43,6 +43,7 @@ if [ $1 == "check" ]
         if which $ZYPP 2>&1 >/dev/null
             then
             $ZYPP list-updates 2>&1 >> $OUTPUT
+	    check_rv_output CHECK_UPGRADE_OS_status
 
             else
             $PRINT "$MSG_MISSING_COMMAND $ZYPP" >> $OUTPUT
