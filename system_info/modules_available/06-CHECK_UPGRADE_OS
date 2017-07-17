@@ -34,6 +34,24 @@ if [ $1 == "check" ]
 
 	$PRINTE "\n\n" >> $OUTPUT
 	;;
+    suse)
+        ######## ZYPPER
+        $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+        $PRINTE "| $MSG_UPGRADE_OS (# $ZYPP list-updates)" >> $OUTPUT
+        $PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
+
+        if which $ZYPP 2>&1 >/dev/null
+            then
+            $ZYPP list-updates 2>&1 >> $OUTPUT
+
+            else
+            $PRINT "$MSG_MISSING_COMMAND $ZYPP" >> $OUTPUT
+            $PRINT "$MSG_NEED_PACKAGE $ZYPP_package" >> $OUTPUT
+            let CHECK_UPGRADE_OS_status=1
+        fi
+
+        $PRINTE "\n\n" >> $OUTPUT
+        ;;
     *)
 	######## Unknown distro
 	$PRINT  "+--------------------------------------------------------------------------------->" >> $OUTPUT
